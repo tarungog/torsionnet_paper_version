@@ -9,8 +9,10 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
     - `conda env create -f environment.yml`
 
 2. Install customized agents:
-    > cd rl-agents
-    > pip install -e .
+    ```
+    cd rl-agents
+    pip install -e .
+    ```
 
 3. Install PyTorch Geometric:
     - `pip install torch-scatter==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html`
@@ -20,12 +22,22 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
     - `pip install torch-geometric`
     - [Pytorch Geometric Official Installation Instructions](https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html)
 
-4. Create "Data" Folder:
-    > cd conformer_generation
-    > mkdir data
-
 
 ## Run
-The code is meant to be run on the Great Lakes cluster, although can be easily modified to run on other compute grids. The key Slurm script to run a training job is located at `gpu_batch_run.sh`, and all other scripts are based off of this one.
+Train and evaluation python scripts are located in the conformer_generation directory for all experiments.
+- Run lignin experiments:
+ - For training, run lignin_train.py
+ ```
+ cd conformer_generation
+ python lignin_train.py
+ ```
 
-It calls the python file `run_batch_train.py`, which is where all details of the experiment must be set before running the job script. Here, we set the train and validation gym environments, along with the algorithmic hyperparameters.
+Tensorboard is available to monitor the training process:
+```
+tensorboard --logdir tf_log/
+```
+
+Model weights are saved in the data directory. Evaluation scripts are available for each of the experiments {lignin, branched_alkanes, t-chains} and are named [experiment name]_eval.py. To run the evaluation script, first replace the path parameter in the "torch.load" function within the script with the path of where the model weights to evaluate are stored. Then run
+```
+python lignin_eval.py
+```

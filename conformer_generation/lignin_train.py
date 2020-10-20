@@ -47,7 +47,7 @@ def ppo_feature(**kwargs):
     config = Config()
     config.merge(kwargs)
 
-    config.num_workers = int(environ['SLURM_CPUS_PER_TASK'])
+    config.num_workers = 35
     single_process = (config.num_workers == 1)
     config.linear_lr_scale = False
     if config.linear_lr_scale:
@@ -59,7 +59,6 @@ def ppo_feature(**kwargs):
 
     config.task_fn = lambda: AdaTask('LigninAllSetPruningLogSkeletonCurriculumLong-v0', num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process) # causes error
 
-    # config.optimizer_fn = lambda params: torch.optim.RMSprop(params, lr=lr, alpha=0.99, eps=1e-5)
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
     config.network = model
     config.hidden_size = model.dim
@@ -73,7 +72,6 @@ def ppo_feature(**kwargs):
     config.rollout_length = 20
     config.recurrence = 5
     config.optimization_epochs = 4
-    # config.mini_batch_size = config.rollout_length * config.num_workers
     config.mini_batch_size = 25
     config.ppo_ratio_clip = 0.2
     config.save_interval = config.num_workers * 1000 * 2
@@ -85,17 +83,13 @@ def ppo_feature(**kwargs):
 
 
 if __name__ == '__main__':
-    # model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
-    # model = GraphTransformerBatch(6, 128, num_layers=12, point_dim=5)
     model = GATBatch(6, 128, num_layers=10, point_dim=5)
-    # model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-ppo_gat_pruning_lignin_log_curr_long-175000.model'))
-    model.to(torch.device('cuda'))
     mkdir('log')
     mkdir('tf_log')
+    mkdir('data')
     set_one_thread()
     select_device(0)
-    tag = environ['SLURM_JOB_NAME']
+    tag = 'lignin-ppo-gat'
     agent = ppo_feature(tag=tag)
-    # agent = a2c_feature(tag=tag)
     logging.info(tag)
     run_steps(agent)

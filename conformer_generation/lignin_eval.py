@@ -32,10 +32,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 from models import *
 from deep_rl import *
-import envs
 
 
-# conformer-ml/data/A2CRecurrentEvalAgent-obabel_sets_seven_energy_sum_rewardnorm-50000.model
 def loaded_policy(model, env):
     num_envs = 1
     single_process = (num_envs == 1)
@@ -73,9 +71,8 @@ def loaded_policy(model, env):
 
 
 if __name__ == '__main__':
-    # model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     model = GATBatch(6, 128, num_layers=10, point_dim=5)
-    # model = GraphTransformerBatch(6, 128)
+    #TODO: Change the path to where the model to be evaluated is stored.
     model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-ppo_gat_pruning_lignin_curr_long_2-280000.model'))
     model.to(torch.device('cuda'))
 
