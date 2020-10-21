@@ -1,5 +1,5 @@
-# torsionnet_paper_version
-This repository is the official PyTorch implementation of "TorsionNet: A Reinforcement Learning Approach to Sequential Conformer Search".
+# TorsionNet Paper
+This repository is the official PyTorch implementation of ["TorsionNet: A Reinforcement Learning Approach to Sequential Conformer Search"](https://arxiv.org/abs/2006.07078).
 
 Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, Ambuj Tewari, and Paul Zimmerman.
 
