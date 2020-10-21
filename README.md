@@ -3,8 +3,14 @@ This repository is the official PyTorch implementation of "TorsionNet: A Reinfor
 
 Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, Ambuj Tewari, and Paul Zimmerman.
 
-## Installation in Great Lakes Cluster
-**Part 1: Prerequisites**
+## Code description
+- The main code for running the experiments and tuning the hyperparameters are `conformer_generation/lignin_train.py`. 
+- The molecule environment code is in `conformer_generation/graphenvironments.py`.
+- The models are stored in `conformer_generation/models.py`
+- The training agents are stored in `rl_agent/agent/PPO_recurrent_agent.py`. Our PPO implementation is built on top of the RL framework [DeepRL](https://github.com/ShangtongZhang/DeepRL).
+
+
+## Installation
 1. Dependencies and versions are stored in `environment.yml`. To create a conda environment with the dependencies, run:
     - `conda env create -f environment.yml`
 
