@@ -8,6 +8,7 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
 - The molecule environment code is in `conformer_generation/graphenvironments.py`.
 - The models are stored in `conformer_generation/models.py`
 - The training agents are stored in `rl_agent/agent/PPO_recurrent_agent.py`. Our PPO implementation is built on top of the RL framework [DeepRL](https://github.com/ShangtongZhang/DeepRL).
+- Scripts for obtaining benchmarks from OpenBabel and Rdkit are in `conformer_generation/benchmark_openbabel.py` and `conformer_generation/benchmark_rdkit.py`.
 
 
 ## Installation
@@ -32,10 +33,10 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
 ## Run
 Train and evaluation python scripts are located in the conformer_generation directory for all experiments.
 - Run lignin experiments:
- - For training, run lignin_train.py
+ - For training, run train_lignin.py
  ```
  cd conformer_generation
- python lignin_train.py
+ python train_lignin.py
  ```
 
 Tensorboard is available to monitor the training process:
@@ -45,5 +46,5 @@ tensorboard --logdir tf_log/
 
 Model weights are saved in the data directory. Evaluation scripts are available for each of the experiments {lignin, branched_alkanes, t-chains} and are named [experiment name]_eval.py. To run the evaluation script, first replace the path parameter in the "torch.load" function within the script with the path of where the model weights to evaluate are stored. Then run
 ```
-python lignin_eval.py
+python eval_lignin.py
 ```
