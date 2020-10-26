@@ -595,18 +595,21 @@ class UniqueSetGibbs(SetGibbs):
 
         rew = np.exp(-1.0 * (current - self.standard_energy)) / self.total
 
-        done = (self.current_step == 200)
-        if done:
+        # done = (self.current_step == 200)
+        if self.done:
             rew -= self.done_neg_reward()
         return rew
 
     def done_neg_reward(self):
         before_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) - self.standard_energy)).sum()
-        self.backup_mol = prune_conformers(self.backup_mol, 0.05)
+        before_conformers = self.backup_mol.GetNumConformers()
+        self.backup_mol = prune_conformers(self.backup_mol, self.pruning_thresh)
         after_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) - self.standard_energy)).sum()
-
+        after_conformers = self.backup_mol.GetNumConformers()
         diff = before_total - after_total
         print('diff is ', diff)
+        print(f'pruned {after_conformers - before_conformers} conformers')
+        print(f'pruning thresh is {self.pruning_thresh}')
         return diff / self.total
 
     def mol_appends(self):
@@ -769,19 +772,6 @@ class TestPruningSetLogGibbs(PruningSetLogGibbs):
     def __init__(self):
         super(TestPruningSetLogGibbs, self).__init__('three_set/')
 
-class TrihexylEval(SetEval):
-    def __init__(self):
-        super(TrihexylEval, self).__init__('trihexyl/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecstupidsimple(self.mol)])
-        return data, self.nonring
-
-class TrihexylUnique(UniqueSetGibbs):
-    def __init__(self):
-        super(TrihexylUnique, self).__init__('trihexyl/')
-
-
 class SetCurriculaExtern(SetGibbs):
     def info(self, info):
         info['choice_ind'] = self.choice_ind
@@ -902,11 +892,6 @@ class SetCurriculaForgetting(SetGibbs):
             obj = json.load(fp)
         return obj
 
-class SetGibbsStupid(SetGibbs):
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecstupidsimple(self.mol)])
-        return data, self.nonring
-
 class SetGibbsDense(SetGibbs):
     def _get_obs(self):
         data = Batch.from_data_list([mol2vecdense(self.mol)])
@@ -927,297 +912,39 @@ class SetGibbsSkeletonPoints(SetGibbs):
         data = Batch.from_data_list([mol2vecskeletonpoints(self.mol)])
         return data, self.nonring
 
-class TestSetCurriculaExternPoints(SetCurriculaExtern, SetGibbsSkeletonPoints):
-    def __init__(self):
-        super(TestSetCurriculaExternPoints, self).__init__('huge_hc_set/10_')
-
-class TestSetCurriculaExternDense(SetCurriculaExtern, SetGibbsDense):
-    def __init__(self):
-        super(TestSetCurriculaExternDense, self).__init__('huge_hc_set/10_')
-
-class TestSetCurriculaExternRandomEnding(RandomEndingSetGibbs, SetCurriculaExtern):
-    def __init__(self):
-        super(TestSetCurriculaExternRandomEnding, self).__init__('huge_hc_set/10_')
-
-class StraightChainTen(SetGibbs):
-    def __init__(self):
-        super(StraightChainTen, self).__init__('straight_chain_10/')
-
-class StraightChainTenEval(SetEval):
-    def __init__(self):
-        super(StraightChainTenEval, self).__init__('straight_chain_10/')
-
-class StraightChainTenEleven(SetGibbs):
-    def __init__(self):
-        super(StraightChainTenEleven, self).__init__('straight_chain_10_11/')
-
-class StraightChainElevenEval(SetEval):
-    def __init__(self):
-        super(StraightChainElevenEval, self).__init__('straight_chain_11/')
-
-class StraightChainTenElevenTwelve(SetGibbs):
-    def __init__(self):
-        super(StraightChainTenElevenTwelve, self).__init__('straight_chain_10_11_12/')
-
-class StraightChainTwelveEval(SetEval):
-    def __init__(self):
-        super(StraightChainTwelveEval, self).__init__('straight_chain_12/')
-
-class AllThreeTorsionSet(SetGibbs):
-    def __init__(self):
-        super(AllThreeTorsionSet, self).__init__('huge_hc_set/3_')
-
-class AllFiveTorsionSet(SetGibbs):
-    def __init__(self):
-        super(AllFiveTorsionSet, self).__init__('huge_hc_set/5_')
-
-class AllEightTorsionSet(SetGibbs):
-    def __init__(self):
-        super(AllEightTorsionSet, self).__init__('huge_hc_set/8_')
-
-class AllEightTorsionSetStupid(SetGibbsStupid):
-    def __init__(self):
-        super(AllEightTorsionSetStupid, self).__init__('huge_hc_set/8_')
-
-class AllEightTorsionSetDense(SetGibbsDense):
-    def __init__(self):
-        super(AllEightTorsionSetDense, self).__init__('huge_hc_set/8_')
-
-class AllTenTorsionSet(SetGibbs):
-    def __init__(self):
-        super(AllTenTorsionSet, self).__init__('huge_hc_set/10_')
-
-class AllTenTorsionSetDense(SetGibbsDense):
-    def __init__(self):
-        super(AllTenTorsionSetDense, self).__init__('huge_hc_set/10_')
-
-class AllTenTorsionSetPruning(PruningSetGibbs):
-    def __init__(self):
-        super(AllTenTorsionSetPruning, self).__init__('huge_hc_set/10_')
-
-class TenTorsionSetCurriculumPruning(PruningSetGibbs, SetCurricula):
-    def __init__(self):
-        super(TenTorsionSetCurriculumPruning, self).__init__('huge_hc_set/10_')
-
-class TenTorsionSetCurriculum(SetCurricula):
-    def __init__(self):
-        super(TenTorsionSetCurriculum, self).__init__('huge_hc_set/10_')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class TenTorsionSetCurriculumDense(SetCurricula, SetGibbsDense):
-    def __init__(self):
-        super(TenTorsionSetCurriculumDense, self).__init__('huge_hc_set/10_')
-
 class TenTorsionSetCurriculumPoints(SetCurriculaExtern, SetGibbsSkeletonPoints, PruningSetGibbs):
     def __init__(self):
         super(TenTorsionSetCurriculumPoints, self).__init__('huge_hc_set/10_')        
 
-class TenTorsionSetLogGibbsCurriculumPoints(SetCurriculaExtern, SetGibbsSkeletonPoints, PruningSetLogGibbs):
+class AlkaneValidation10(UniqueSetGibbs):
     def __init__(self):
-        super(TenTorsionSetLogGibbsCurriculumPoints, self).__init__('huge_hc_set/10_')
+        super(AlkaneValidation10, self).__init__('alkane_validation_10/')
 
-class TenTorsionSetLogGibbsPoints(SetGibbsSkeletonPoints, PruningSetLogGibbs):
+class AlkaneTest11(UniqueSetGibbs):
     def __init__(self):
-        super(TenTorsionSetLogGibbsPoints, self).__init__('huge_hc_set/10_')
+        super(AlkaneTest11, self).__init__('alkane_test_11/')
 
-class TenTorsionSetGibbsPoints(SetGibbsSkeletonPoints, PruningSetGibbs):
+class AlkaneTest22(UniqueSetGibbs):
     def __init__(self):
-        super(TenTorsionSetGibbsPoints, self).__init__('huge_hc_set/10_')
-
-class TenTorsionSetCurriculumExp(SetCurriculaExp):
-    def __init__(self):
-        super(TenTorsionSetCurriculumExp, self).__init__('huge_hc_set/10_')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class TenTorsionSetCurriculumForgetting(SetCurriculaForgetting):
-    def __init__(self):
-        super(TenTorsionSetCurriculumForgetting, self).__init__('huge_hc_set/10_')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class Diff(SetGibbs):
-    def __init__(self):
-        super(Diff, self).__init__('diff/')
-
-class DiffDense(SetGibbsDense):
-    def __init__(self):
-        super(DiffDense, self).__init__('diff/')
-
-class DiffPoints(SetGibbsSkeletonPoints):
-    def __init__(self):
-        super(DiffPoints, self).__init__('diff/')
-
-class DiffUnique(UniqueSetGibbs):
-    def __init__(self):
-        super(DiffUnique, self).__init__('diff/')
-
-class DiffPruning(PruningSetGibbs):
-    def __init__(self):
-        super(DiffPruning, self).__init__('diff/')
-
-class Diff11(SetEval):
-    def __init__(self):
-        super(Diff11, self).__init__('diff_11/')
-
-class Diff11Unique(UniqueSetGibbs):
-    def __init__(self):
-        super(Diff11Unique, self).__init__('diff_11/')
-
-class SmallMoleculeSet(SetGibbs):
-    def __init__(self):
-        super(SmallMoleculeSet, self).__init__('huge_hc_set/2')
-
-class Trihexyl(SetGibbs):
-    def __init__(self):
-        super(Trihexyl, self).__init__('trihexyl/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecbasic(self.mol)])
-        return data, self.nonring
-
-class GiantSet(SetGibbs):
-    def __init__(self):
-        super(GiantSet, self).__init__('giant_hc_set/')
-
-class OneSet(SetGibbs):
-    def __init__(self):
-        super(OneSet, self).__init__('one_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class TwoSet(SetGibbs):
-    def __init__(self):
-        super(TwoSet, self).__init__('two_set/')
-
-class ThreeSet(SetGibbs):
-    def __init__(self):
-        super(ThreeSet, self).__init__('three_set/')
-
-class ThreeSetPruning(PruningSetGibbs):
-    def __init__(self):
-        super(ThreeSetPruning, self).__init__('three_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class FourSet(SetGibbs):
-    def __init__(self):
-        super(FourSet, self).__init__('four_set/')
-
-class FourSetUnique(UniqueSetGibbs):
-    def __init__(self):
-        super(FourSetUnique, self).__init__('four_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecstupidsimple(self.mol)])
-        return data, self.nonring
-
-class OneSetUnique(UniqueSetGibbs):
-    def __init__(self):
-        super(OneSetUnique, self).__init__('one_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class OneSetPruning(PruningSetGibbs):
-    def __init__(self):
-        super(OneSetPruning, self).__init__('one_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class LigninAllSet(SetGibbs):
-    def __init__(self):
-        super(LigninAllSet, self).__init__('lignins_out/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton_features(self.mol)])
-        return data, self.nonring
-
-
-class LigninAllSet2(SetGibbs):
-    def __init__(self):
-        super(LigninAllSet2, self).__init__('lignins_out/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton_features(self.mol)])
-        return data, self.nonring
-
-    def _get_reward(self):
-        if tuple(self.action) in self.seen:
-            print('already seen')
-            return 0.0
-        else:
-            self.seen.add(tuple(self.action))
-            current = confgen.get_conformer_energies(self.mol)[0] * 0.5
-
-            print('standard', self.standard_energy)
-            print('current', current)
-
-            if current - self.standard_energy > 10.0:
-                return 0.0
-
-            x = current - self.standard_energy
-            return 1.0 - x/10.0
-
-class ThreeSetSkeleton(SetGibbs):
-    def __init__(self):
-        super(ThreeSetSkeleton, self).__init__('three_set/')
-
-    def _get_obs(self):
-        data = Batch.from_data_list([mol2vecskeleton(self.mol)])
-        return data, self.nonring
-
-class LigninAllSetSkeletonCurriculum(SetCurriculaExtern, SetGibbsSkeletonPoints):
-    def __init__(self):
-        super(LigninAllSetSkeletonCurriculum, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False)
-
-class LigninAllSetPruningSkeletonCurriculum(PruningSetGibbs, SetGibbsSkeletonPoints):#TODO: add SetCurriculaExtern
-    def __init__(self):
-        super(LigninAllSetPruningSkeletonCurriculum, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False)
-
-class LigninAllSetPruningLogSkeletonCurriculum(SetCurriculaExtern, PruningSetLogGibbs, SetGibbsSkeletonPoints):
-    def __init__(self):
-        super(LigninAllSetPruningLogSkeletonCurriculum, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False)
+        super(AlkaneTest22, self).__init__('alkane_test_22/')
 
 class LigninAllSetPruningLogSkeletonCurriculumLong(SetCurriculaExtern, PruningSetLogGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
     def __init__(self):
         super(LigninAllSetPruningLogSkeletonCurriculumLong, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False)
 
-class LigninAllSetPruningSkeletonCurriculumLong(SetCurriculaExtern, PruningSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
+class LigninAllSetPruningLogSkeletonCurriculumLong015(SetCurriculaExtern, PruningSetLogGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
     def __init__(self):
-        super(LigninAllSetPruningSkeletonCurriculumLong, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False)
+        super(LigninAllSetPruningLogSkeletonCurriculumLong015, self).__init__('lignin_hightemp/', temp_normal=0.25, sort_by_size=False, pruning_thresh=0.15)
 
-class LigninPruningSkeletonEval(UniqueSetGibbs, SetGibbsSkeletonPoints):
+class LigninPruningSkeletonValidationLong(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
     def __init__(self):
-        super(LigninPruningSkeletonEval, self).__init__('lignin_eval_sample/', temp_normal=0.25, sort_by_size=False)
-
-class LigninPruningSkeletonEvalFinal(UniqueSetGibbs, SetGibbsSkeletonPoints):
-    def __init__(self):
-        super(LigninPruningSkeletonEvalFinal, self).__init__('lignin_eval_final/', eval=False, temp_normal=0.25, sort_by_size=False)
-
-class LigninPruningSkeletonEvalFinalLong(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
-    def __init__(self):
-        super(LigninPruningSkeletonEvalFinalLong, self).__init__('lignin_eval_final/', eval=False, temp_normal=0.25, sort_by_size=False)
-
-class LigninPruningSkeletonEvalFinalLongSave(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
-    def __init__(self):
-        super(LigninPruningSkeletonEvalFinalLongSave, self).__init__('lignin_eval_final/', eval=True, temp_normal=0.25, sort_by_size=False)
+        super(LigninPruningSkeletonValidationLong, self).__init__('lignin_eval_sample/', temp_normal=0.25, sort_by_size=False)
 
 ## sgld normed 
-class LigninPruningSkeletonEvalSgldFinalLong(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
+class LigninPruningSkeletonEvalSgldFinalLong015(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
     def __init__(self):
-        super(LigninPruningSkeletonEvalSgldFinalLong, self).__init__('lignin_eval_final_sgld/', eval=False, temp_normal=0.2519, sort_by_size=False)
+        super(LigninPruningSkeletonEvalSgldFinalLong015, self).__init__('lignin_eval_final_sgld/', eval=False, temp_normal=0.2519, sort_by_size=False, pruning_thresh=0.15)
+
+class LigninPruningSkeletonEvalSgldFinalLong015Save(UniqueSetGibbs, SetGibbsSkeletonPoints, LongEndingSetGibbs):
+    def __init__(self):
+        super(LigninPruningSkeletonEvalSgldFinalLong015Save, self).__init__('lignin_eval_final_sgld/', eval=True, temp_normal=0.2519, sort_by_size=False, pruning_thresh=0.15)

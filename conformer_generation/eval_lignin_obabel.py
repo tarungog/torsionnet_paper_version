@@ -72,7 +72,7 @@ def run_lignins_obabel(tup):
             mol.AddConformer(c, assignId=True)
 
         res = AllChem.MMFFOptimizeMoleculeConfs(mol)
-        mol = prune_conformers(mol, 0.10)
+        mol = prune_conformers(mol, 0.15)
 
         energys = (confgen.get_conformer_energies(mol) - energy_norm) * (1/3.97)
         total = np.sum(np.exp(-energys))
@@ -86,8 +86,7 @@ if __name__ == '__main__':
     outputs = []
     times = []
 
-    m = Chem.MolFromMolFile('lignin_eval_final/8_0.mol', removeHs=False)
-    # minfo = {"molfile": "8_0.mol", "standard": 148.6097477747475, "total": 1.647274557813102}
+    m = Chem.MolFromMolFile('lignin_eval_final_sgld/8_0.mol', removeHs=False)
 
     smi = Chem.MolToSmiles(m)
     standard = 525.8597421636731

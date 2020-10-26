@@ -236,9 +236,6 @@ class BestTestGibbs2(BestGibbs):
     metadata = {'render.modes': ['human']}
 
     def _get_reward(self):
-        # indnum = self.ind_select + 4
-        # path = os.path.join(self.folder_name, f'{indnum}.mol')
-
         path = os.path.join(self.folder_name, f'optimal_{self.ind_select}.mol')
         print(path)
         mol = Chem.MolFromMolFile(path, removeHs=False)
@@ -289,33 +286,6 @@ class BestCurriculaExp(BestGibbs):
         with open(cjson) as fp:
             obj = json.load(fp)
         return obj
-
-    # def info(self, info):
-    #     info['choice_ind'] = self.choice_ind
-    #     return info
-
-    # def molecule_choice(self):
-    #     self.choice_ind = min(self.choice_ind, len(self.all_files))
-
-    #     if self.choice_ind != 1:
-    #         p = 0.5 * np.ones(self.choice_ind) / (self.choice_ind - 1)
-    #         p[-1] = 0.5
-    #         cjson = np.random.choice(self.all_files[0:self.choice_ind], p=p)
-    #     else:
-    #         cjson = self.all_files[0]
-
-    #     print(cjson, '\n\n\n\n')
-
-    #     with open(cjson) as fp:
-    #         obj = json.load(fp)
-    #     return obj
-
-    # def change_level(up_or_down):
-    #     if up_or_down:
-    #         self.choice_ind += 1
-
-    #     elif self.choice_ind != 1:
-    #         self.choice_ind -= 1
 
 class TChainTrain(BestCurriculaExp):
     def __init__(self):

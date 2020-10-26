@@ -25,7 +25,6 @@ gym.envs.register(
      max_episode_steps=1000,
 )
 
-
 for i in range(0, 10):
      gym.envs.register(
           id=f'TChainTest-v{i}',

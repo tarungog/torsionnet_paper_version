@@ -12,7 +12,6 @@ from rdkit import rdBase
 from rdkit.Chem import AllChem, TorsionFingerprints
 from rdkit.Chem import Draw,PyMol,rdFMCS
 from rdkit.Chem.Draw import IPythonConsole
-# %alias_magic t timeit
 
 import gym
 from gym import spaces
@@ -22,10 +21,8 @@ from stable_baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 import py3Dmol
 from deep_rl import *
 from deep_rl.component.envs import DummyVecEnv
-# from stable_baselines.common.vec_env import DummyVecEnv
 
 import logging
-
 
 def drawit(m, p, confId=-1):
     mb = Chem.MolToMolBlock(m, confId=confId)
@@ -110,53 +107,11 @@ class ConformerGeneratorCustom(conformers.ConformerGenerator):
                 Molecule.
         """
         pbar = tqdm(total=mol.GetNumConformers())
-        # pct_prog = 100 / mol.GetNumConformers()
-    # #     i = 0
         for conf in mol.GetConformers():
-    #       i += 1
-            # pbar.set_description("Minimizing %s" % i)
             ff = self.get_molecule_force_field(mol, conf_id=conf.GetId())
             ff.Minimize()
             pbar.update(1)
         pbar.close()
-
-    # def get_conformer_energies(self, mol, mp=False):
-    #     """
-    #     Calculate conformer energies.
-
-    #     Parameters
-    #     ----------
-    #     mol : RDKit Mol
-    #         Molecule.
-
-    #     Returns
-    #     -------
-    #     energies : array_like
-    #         Minimized conformer energies.
-    #     """
-    #     energies = []
-    #     for conf in mol.GetConformers():
-    #         ff = self.get_molecule_force_field(mol, conf_id=conf.GetId())
-    #         energy = ff.CalcEnergy()
-    #         energies.append(energy)
-    #         energies = np.asarray(energies, dtype=float)
-    #         return energies
-        
-    #     if mp:
-    #         confs = [conf for conf in mol.GetConformers()]
-    #         ffs = [self.get_molecule_force_field(mol, conf_id=conf.GetId()) for conf in mol.GetConformers()]
-    #         args = zip(confs, ffs)
-
-    #     with ProcessPoolExecutor() as executor:
-    #         executor.map(create_branched, range(10000))
-
-
-    #     for conf in mol.GetConformers():
-    #         ff = self.get_molecule_force_field(mol, conf_id=conf.GetId())
-    #         energy = ff.CalcEnergy()
-    #         energies.append(energy)
-    #         energies = np.asarray(energies, dtype=float)
-    #         return energies
 
     def prune_conformers(self, mol, rmsd, heavy_atoms_only=True):
         """

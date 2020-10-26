@@ -44,7 +44,10 @@ Tensorboard is available to monitor the training process:
 tensorboard --logdir tf_log/
 ```
 
-Model weights are saved in the data directory. Evaluation scripts are available for each of the experiments {lignin, branched_alkanes, t-chains} and are named [experiment name]_eval.py. To run the evaluation script, first replace the path parameter in the "torch.load" function within the script with the path of where the model weights to evaluate are stored. Then run
+Model weights are saved in the data directory. Evaluation scripts are available for each of the experiments {lignin, branched_alkanes, t-chains} and are named [experiment name]_eval.py. To run the evaluation script, we will provide sample model weights. If training from scratch, first replace the path parameter in the "torch.load" function in the script with the path of the model weights that perform best on the validation environment. This can be checked via tensorboard. Model weights are stored at the same cadence as validation runs. After replacing the path parameter, the eval script can be run e.g.
 ```
 python eval_lignin.py
 ```
+
+## Results
+This is a best effort reproduction of our implementation. There may be some nondeterminism.

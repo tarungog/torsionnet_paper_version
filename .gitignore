@@ -132,3 +132,4 @@ dmypy.json
 conformer_generation/data/
 conformer_generation/log/
 conformer_generation/tf_log/
+conformer_generation/huge_hc_set/

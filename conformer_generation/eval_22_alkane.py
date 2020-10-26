@@ -23,9 +23,9 @@ from deep_rl.component.envs import DummyVecEnv, make_env
 
 import envs
 
-random.seed(0)
-np.random.seed(0)
-torch.manual_seed(0)
+random.seed(4)
+np.random.seed(4)
+torch.manual_seed(4)
 
 from concurrent.futures import ProcessPoolExecutor
 
@@ -35,6 +35,7 @@ from deep_rl import *
 import envs
 
 
+# conformer-ml/data/A2CRecurrentEvalAgent-obabel_sets_seven_energy_sum_rewardnorm-50000.model
 def loaded_policy(model, env):
     num_envs = 1
     single_process = (num_envs == 1)
@@ -72,17 +73,23 @@ def loaded_policy(model, env):
 
 
 if __name__ == '__main__':
-    model = GATBatch(6, 128, num_layers=10, point_dim=5)
-    model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-ppo_gat_pruning_lignin_log_curr_long_cont-210000.model', map_location=torch.device('cpu')))
+    model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
+    
+    model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-test_series_6_rtgn_log_alkane_ppo_curr_2_cont-1505000.model'))
+    model.to(torch.device('cuda'))
 
     outputs = []
     times = []
+
     for i in range(10):
         start = time.time()
-        output = loaded_policy(model, 'LigninPruningSkeletonEvalSgldFinalLong015-v0')
+        output = loaded_policy(model, f'Eval22Alkane-v0')
         print('output', output)
         end = time.time()
         outputs.append(output)
         times.append(end - start)
     print('outputs', outputs)
+    print(np.array(outputs).mean(), np.array(outputs).std())
     print('times', times)
+    print(np.array(times).mean(), np.array(times).std())
+

@@ -27,10 +27,6 @@ from deep_rl.component.envs import DummyVecEnv, make_env
 import envs
 from models import *
 
-random.seed(0)
-np.random.seed(0)
-torch.manual_seed(0)
-
 class Curriculum():
     def __init__(self, win_cond=0.7, success_percent=0.7, fail_percent=0.2, min_length=100):
         self.win_cond = win_cond
@@ -41,7 +37,7 @@ class Curriculum():
     def return_win_cond():
         return self.win_cond
 
-def ppo_feature(**kwargs):
+def ppo_feature(env_name, args, **kwargs):
     generate_tag(kwargs)
     kwargs.setdefault('log_level', 0)
     config = Config()
@@ -50,14 +46,17 @@ def ppo_feature(**kwargs):
     config.num_workers = 35
     single_process = (config.num_workers == 1)
     config.linear_lr_scale = False
+
+    base_lr = args.learning_rate if args.learning_rate else 5e-6
+
     if config.linear_lr_scale:
-        lr = 2e-5 * config.num_workers
+        lr = base_lr * config.num_workers
     else:
-        lr = 2e-5 * np.sqrt(config.num_workers)
+        lr = base_lr * np.sqrt(config.num_workers)
 
     config.curriculum = Curriculum(min_length=config.num_workers)
 
-    config.task_fn = lambda: AdaTask('LigninAllSetPruningLogSkeletonCurriculumLong-v0', num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process) # causes error
+    config.task_fn = lambda: AdaTask(env_name, num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process) # causes error
 
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
     config.network = model
@@ -72,24 +71,38 @@ def ppo_feature(**kwargs):
     config.rollout_length = 20
     config.recurrence = 5
     config.optimization_epochs = 4
+    # config.mini_batch_size = config.rollout_length * config.num_workers
     config.mini_batch_size = 25
     config.ppo_ratio_clip = 0.2
     config.save_interval = config.num_workers * 1000 * 2
     config.eval_interval = config.num_workers * 1000 * 2
     config.eval_episodes = 1
-    config.eval_env = AdaTask('LigninPruningSkeletonEvalFinalLong-v0', seed=random.randint(0,7e4))
+    config.eval_env = AdaTask('LigninPruningSkeletonValidationLong-v0', seed=random.randint(0,7e4))
     config.state_normalizer = DummyNormalizer()
     run_steps(PPORecurrentEvalAgent(config))
 
 
 if __name__ == '__main__':
-    model = GATBatch(6, 128, num_layers=10, point_dim=5)
+    parser = argparse.ArgumentParser(description='Run batch training')
+
+    parser.add_argument('-lr', '--learning_rate', type=float)
+    parser.add_argument('-s', '--starter')
+
+    args = parser.parse_args()
+    
+    model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
+    env_name = 'LigninAllSetPruningLogSkeletonCurriculumLong-v0'
+    
+    if args.starter:
+        print(f'loading {args.starter}')
+        model.load_state_dict(torch.load(f'data/{args.starter}'))
+
+    model.to(torch.device('cuda'))
     mkdir('log')
     mkdir('tf_log')
-    mkdir('data')
     set_one_thread()
     select_device(0)
-    tag = 'lignin-ppo-gat'
-    agent = ppo_feature(tag=tag)
+    tag = 'train_lignins'
+    agent = ppo_feature(env_name, args, tag=tag)
     logging.info(tag)
     run_steps(agent)
