@@ -73,7 +73,7 @@ def loaded_policy(model, env):
 
 if __name__ == '__main__':
     model = GATBatch(6, 128, num_layers=10, point_dim=5)
-    model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-ppo_gat_pruning_lignin_log_curr_long_cont-210000.model', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('trained_models/tnet_alkane_eval_final.model', map_location=torch.device('cpu')))
 
     outputs = []
     times = []

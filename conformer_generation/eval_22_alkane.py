@@ -75,7 +75,7 @@ def loaded_policy(model, env):
 if __name__ == '__main__':
     model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     
-    model.load_state_dict(torch.load('data/PPORecurrentEvalAgent-test_series_6_rtgn_log_alkane_ppo_curr_2_cont-1505000.model'))
+    model.load_state_dict(torch.load('trained_models/tnet_alkane_eval_final.model'))
     model.to(torch.device('cuda'))
 
     outputs = []

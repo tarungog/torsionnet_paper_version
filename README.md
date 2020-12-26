@@ -9,6 +9,7 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
 - The models are stored in `conformer_generation/models.py`
 - The training agents are stored in `rl_agent/agent/PPO_recurrent_agent.py`. Our PPO implementation is built on top of the RL framework [DeepRL](https://github.com/ShangtongZhang/DeepRL).
 - Scripts for obtaining benchmarks from OpenBabel and Rdkit are in `conformer_generation/benchmark_openbabel.py` and `conformer_generation/benchmark_rdkit.py`.
+- Pre-trained models included in `trained_models/`
 
 
 ## Installation
