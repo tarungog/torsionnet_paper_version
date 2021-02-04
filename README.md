@@ -18,7 +18,7 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
 
 2. Install customized agents:
     ```
-    cd rl-agents
+    cd rl_agents
     pip install -e .
     ```
 
