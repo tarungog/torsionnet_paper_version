@@ -1,3 +1,6 @@
+# Vs Code files
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -129,7 +132,7 @@ dmypy.json
 .pyre/
 
 # Output files
-conformer_generation/data/
-conformer_generation/log/
-conformer_generation/tf_log/
-conformer_generation/huge_hc_set/
+TorsionNet/data/
+TorsionNet/log/
+TorsionNet/tf_log/
+TorsionNet/huge_hc_set/
