@@ -1,42 +1,25 @@
-from os import environ
-
 import numpy as np
-from rdkit import Chem
-from rdkit.Chem import AllChem
-import multiprocessing
-import logging
-import torch
-import pandas as pd
-from torch_geometric.data import Data, Batch
-from torch_geometric.transforms import Distance
-import torch_geometric.nn as gnn
-
-from utils import *
-
 import random
-
+import argparse
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+import logging
 
-from deep_rl import *
+from main.config import Config
+from main.utils import *
+from main.models import *
+from main.environments import Task
+from main.agents import A2CRecurrentCurriculumAgent
 
-from deep_rl.component.envs import DummyVecEnv, make_env
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-import envs
-from models import RTGNBatch
-
-from tchain_agents import A2CRecurrentCurriculumAgent
-
-def a2c_feature(**kwargs):
-    generate_tag(kwargs)
-    kwargs.setdefault('log_level', 0)
+def a2c_feature(tag, env_name, model):
     config = Config()
-    config.merge(kwargs)
+    config.tag=tag
+    config.env_name = env_name
 
     config.num_workers = 1
     single_process = (config.num_workers == 1)
-    config.task_fn = lambda: AdaTask('TChainTrain-v0', num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process)
+    config.train_env = Task(config.env_name, num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=single_process)
     config.linear_lr_scale = False
     if config.linear_lr_scale:
         lr = 7e-5 * config.num_workers
@@ -54,18 +37,25 @@ def a2c_feature(**kwargs):
     config.gradient_clip = 0.5 #max_grad_norm
     config.max_steps = 5000000
     config.save_interval = config.num_workers * 200 * 5
-    config.state_normalizer = DummyNormalizer()
-    agent = A2CRecurrentCurriculumAgent(config)
-    return agent
+
+    return A2CRecurrentCurriculumAgent(config)
 
 if __name__ == '__main__':
     model = RTGNBatch(6, 128, edge_dim=1)
-    model.to(torch.device('cuda'))
+
+
     mkdir('log')
     mkdir('tf_log')
+    mkdir('data')
+
+    model.to(device)
     set_one_thread()
     select_device(0)
-    tag = environ['SLURM_JOB_NAME']
-    agent = a2c_feature(tag=tag)
-    print(tag)
-    run_steps(agent)
+    tag = "tchain train"
+
+    env_name = 'TChainTrain-v0'
+    agent = a2c_feature(tag=tag, env_name=env_name, model=model)
+    logging.info(env_name)
+    logging.info(tag)
+
+    agent.run_steps()

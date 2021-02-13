@@ -5,7 +5,7 @@ import json
 import tqdm
 import numpy as np
 
-from utils import *
+from main.utils import *
 
 def create_t_alkane(i):
     cin = 'C' * i

@@ -7,7 +7,7 @@ from rdkit.Chem.AllChem import Compute2DCoords
 from rdkit.Chem.Draw import MolToImage
 
 import json
-from utils import *
+from main.utils import *
 from tqdm import tqdm
 
 # Lignin-KMC functions and global variables used in this notebook

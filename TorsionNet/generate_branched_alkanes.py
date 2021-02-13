@@ -8,7 +8,7 @@ import numpy as np
 import random
 from concurrent.futures import ProcessPoolExecutor
 
-from utils import *
+from main.utils import *
 
 def create_branched(i):
     m = Chem.MolFromSmiles('CCCC')

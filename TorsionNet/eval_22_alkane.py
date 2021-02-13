@@ -9,8 +9,6 @@ from torch_geometric.data import Data, Batch
 from torch_geometric.transforms import Distance
 import torch_geometric.nn as gnn
 
-from utils import *
-
 import random
 import time
 
@@ -18,10 +16,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from deep_rl import *
-from deep_rl.component.envs import DummyVecEnv, make_env
-
-import envs
+from main.utils import *
+from main.models import *
+from main.environments import Task
 
 random.seed(4)
 np.random.seed(4)
@@ -29,10 +26,7 @@ torch.manual_seed(4)
 
 from concurrent.futures import ProcessPoolExecutor
 
-
-from models import *
-from deep_rl import *
-import envs
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 # conformer-ml/data/A2CRecurrentEvalAgent-obabel_sets_seven_energy_sum_rewardnorm-50000.model
@@ -40,7 +34,7 @@ def loaded_policy(model, env):
     num_envs = 1
     single_process = (num_envs == 1)
 
-    env = AdaTask(env, seed=random.randint(0,7e4), num_envs=num_envs, single_process=single_process)
+    env = Task(env, seed=random.randint(0,7e4), num_envs=num_envs, single_process=single_process)
     state = env.reset()
     total_reward = 0
     start = True
@@ -75,15 +69,15 @@ def loaded_policy(model, env):
 if __name__ == '__main__':
     model = RTGNBatch(6, 128, edge_dim=6, point_dim=5)
     
-    model.load_state_dict(torch.load('trained_models/tnet_alkane_eval_final.model'))
-    model.to(torch.device('cuda'))
+    model.load_state_dict(torch.load('trained_models/tnet_alkane_eval_final.model', map_location=device))
+    model.to(device)
 
     outputs = []
     times = []
 
     for i in range(10):
         start = time.time()
-        output = loaded_policy(model, f'Eval22Alkane-v0')
+        output = loaded_policy(model, 'AlkaneTest22-v0')
         print('output', output)
         end = time.time()
         outputs.append(output)

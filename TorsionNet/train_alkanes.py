@@ -37,7 +37,7 @@ def ppo_feature(args, tag, env_name, model):
     else:
         lr = lr_base * np.sqrt(config.num_workers)
 
-    win_cond = 1.4
+    win_cond =  1.4
 
     config.curriculum = Curriculum(min_length=config.num_workers, win_cond=win_cond)
     config.train_env = Task(config.env_name, num_envs=config.num_workers, seed=random.randint(0,1e5) single_process=False)
