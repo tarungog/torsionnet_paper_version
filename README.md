@@ -39,6 +39,7 @@ Train and evaluation python scripts are located in the conformer_generation dire
  cd conformer_generation
  python train_lignin.py
  ```
+ NOTE: for training the alkane environment, unzip the file `huge_hc_set.zip` first.
 
 Tensorboard is available to monitor the training process:
 ```
