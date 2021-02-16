@@ -6,7 +6,7 @@ Tarun Gogineni, Ziping Xu, Exequiel Punzalan, Runxuan Jiang, Joshua Kammeraad, A
 
 ## Installation
 
-1. Anaconda should be install in order to create a Conda environment with the required dependencies. Anaconda can be installed [here](https://www.anaconda.com/products/individual).
+1. Anaconda should be installed in order to create a Conda environment with the required dependencies. Anaconda can be installed [here](https://www.anaconda.com/products/individual).
 
 2. Dependencies and versions are stored in `environment.yml`. To create a conda environment with the dependencies, run:
     ```
