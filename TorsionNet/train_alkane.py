@@ -40,7 +40,7 @@ def ppo_feature(args, tag, env_name, model):
     win_cond =  1.4
 
     config.curriculum = Curriculum(min_length=config.num_workers, win_cond=win_cond)
-    config.train_env = Task(config.env_name, num_envs=config.num_workers, seed=random.randint(0,1e5) single_process=False)
+    config.train_env = Task(config.env_name, num_envs=config.num_workers, seed=random.randint(0,1e5), single_process=False)
 
     config.optimizer_fn = lambda params: torch.optim.Adam(params, lr=lr, eps=1e-5)
     config.network = model
