@@ -89,7 +89,6 @@ if __name__ == '__main__':
 
     model.to(device)
     set_one_thread()
-    select_device(0)
     tag = 'alkanes train'
 
     env_name = 'TenTorsionSetCurriculumPoints-v0'

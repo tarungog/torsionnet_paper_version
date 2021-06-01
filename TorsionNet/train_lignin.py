@@ -85,7 +85,6 @@ if __name__ == '__main__':
 
     model.to(device)
     set_one_thread()
-    select_device(0)
     tag = 'train_lignins'
     env_name = 'LigninAllSetPruningLogSkeletonCurriculumLong-v0'
 

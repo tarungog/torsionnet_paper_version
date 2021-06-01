@@ -50,7 +50,6 @@ if __name__ == '__main__':
 
     model.to(device)
     set_one_thread()
-    select_device(0)
     tag = "tchain train"
 
     env_name = 'TChainTrain-v0'
