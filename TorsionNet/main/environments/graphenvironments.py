@@ -602,10 +602,10 @@ class UniqueSetGibbs(SetGibbs):
         return rew
 
     def done_neg_reward(self):
-        before_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) - self.standard_energy)).sum()
+        before_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) * self.temp_normal - self.standard_energy)).sum()
         before_conformers = self.backup_mol.GetNumConformers()
         self.backup_mol = prune_conformers(self.backup_mol, self.pruning_thresh)
-        after_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) - self.standard_energy)).sum()
+        after_total = np.exp(-1.0 * (confgen.get_conformer_energies(self.backup_mol) * self.temp_normal - self.standard_energy)).sum()
         after_conformers = self.backup_mol.GetNumConformers()
         diff = before_total - after_total
         print('diff is ', diff)
@@ -652,12 +652,12 @@ class PruningSetGibbs(SetGibbs):
         return rew
 
     def done_neg_reward(self, current_energy):
-        before_total = np.exp(-1.0 * (np.array(self.backup_energys) - self.standard_energy)).sum()
+        before_total = np.exp(-1.0 * (np.array(self.backup_energys) * self.temp_normal - self.standard_energy)).sum()
 
         self.backup_mol, energy_args = prune_last_conformer(self.backup_mol, self.pruning_thresh, self.backup_energys)
         self.backup_energys = list(np.array(self.backup_energys)[np.array(energy_args)])
 
-        after_total = np.exp(-1.0 * (np.array(self.backup_energys) - self.standard_energy)).sum()
+        after_total = np.exp(-1.0 * (np.array(self.backup_energys) * self.temp_normal - self.standard_energy)).sum()
 
         assert self.backup_mol.GetNumConformers() == len(self.backup_energys)
 
